@@ -50,7 +50,7 @@ class Item(Resource):
         # return item if it already exists (from function "find_by_name")
         # make sure item is not already in the DB
         if self.find_by_name(name):
-            return {'message': "An item with name '{}' already exists.".format(name)},400
+            return {'message': "An item with name '{}' already exists.".format(name)},400 # something went wrong with request
 
         # parses data
         data = Item.parser.parse_args()
@@ -61,6 +61,18 @@ class Item(Resource):
             'price': data['price']
         }
 
+        # exception block
+        try:
+            self.insert(item)
+        except:
+            return {"message": "An error occurred inserting the item."}, 500 # internal server error
+
+        # return the item to DB
+        # HTTP status code '201' means object has been created
+        return item, 201
+
+    @classmethod
+    def insert(cls, item):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -72,38 +84,74 @@ class Item(Resource):
         connection.commit()
         connection.close()
 
-        # return the item to DB
-        # HTTP status code '201' means object has been created
-        return item, 201
-
     def delete(self, name):
-        # items variable in this block is outer items variable
-        global items
-        # look for the elements in item, except one element, which that element would get deleted
-        items = list(filter(lambda x: x['name'] != name, items))
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        # delete from where the name is equal to specific value
+        # the "name" is unique to each row
+        query = "DELETE FROM items WHERE name=?"
+        cursor.execute(query, (name,))
+
+        connection.commit()
+        connection.close()
 
         return {'message': 'Item deleted'}
 
-    # create item or update existing item
+    # insert item or update existing item
     def put(self, name):
         data = Item.parser.parse_args()
 
         # find out if the item already exists
-        item = next(filter(lambda x: x['name'] == name, items), None)
+        item = self.find_by_name(name)
+
+        # dictionary
+        updated_item = {
+            'name': name,
+            'price': data['price']
+        }
 
         # if there is no item, create a new item
         if item is None:
-            item = {
-                'name': name,
-                'price': data['price']
-            }
-            items.append(item)
+            try:
+                self.insert(updated_item)
+            except:
+                return {"message": "An error occurred inserting the item"}, 500
         # else if item already exists, update the item
         else:
-            item.update(data)
-        return item
+            try:
+                self.update(updated_item)
+            except:
+                return {"message": "An error occurred inserting the item"}, 500
+        return updated_item
+
+    @classmethod
+    def update(cls, item):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        # update items table and set the price where the name is equal to something
+        query = "UPDATE items SET price=? WHERE name=?"
+        cursor.execute(query, (item['price'], item['name']))
+
+        connection.commit()
+        connection.close()
 
 # return list of all our items
 class ItemList(Resource):
     def get(self):
-        return {'items': items}
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        # select everything from items table
+        query = "SELECT * FROM items"
+        result = cursor.execute(query)
+
+        items = []
+
+        for row in result:
+            items.append({'name': row[0], 'price': row[1]})
+
+        connection.close()
+
+        return{'items': items}

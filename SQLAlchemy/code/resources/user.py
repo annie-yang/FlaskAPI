@@ -30,6 +30,6 @@ class UserRegister(Resource):
 
         # for each of keys in data, pass all username and password
         user = UserModel(**data)
-        user.saved_to_db()
+        user.save_to_db()
 
         return{"message": "User created sucessfully."}, 201

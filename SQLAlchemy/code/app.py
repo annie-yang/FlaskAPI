@@ -16,6 +16,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'fjewiojfeiowj'
 api = Api(app)
 
+# write to 'data.db' file to where tables are created for you
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 # JWT creates a new endpoint (/auth)
 # when '/auth' is called, we send username and password
 # JWT then sends the username and password to authentication

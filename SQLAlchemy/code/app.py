@@ -9,8 +9,10 @@ from resources.user import UserRegister
 from resources.item import Item, ItemList
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 # don't track every changes made by Flask SQLAlchemy modification tracker
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 app.secret_key = 'fjewiojfeiowj'
 api = Api(app)
 

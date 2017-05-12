@@ -1,7 +1,10 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
+
+# inheritance
 from security import authenticate, identity
+from user import UserRegister
 
 app = Flask(__name__)
 app.secret_key = 'fjewiojfeiowj'
@@ -102,6 +105,7 @@ class ItemList(Resource):
 # access Student API
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
+api.add_resource(UserRegister, '/register')
 
 # run on port and show error message
 app.run(port=5000, debug=True)

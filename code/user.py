@@ -1,7 +1,7 @@
 # user objects
-class User(object):
+class User():
     # store of data
-    def __init__(self, id, username, password):
-        self.id = id
+    def __init__(self, _id, username, password):
+        self.id = _id
         self.username = username
         self.password = password

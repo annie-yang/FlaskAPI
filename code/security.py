@@ -9,8 +9,8 @@ users = [
 ]
 
 # assigning key value pair
-username_table = {u.username: u for u in users}
-userid_table = {u.id: u for u in users}
+username_mapping = {u.username: u for u in users}
+userid_mapping = {u.id: u for u in users}
 
 # authenticate the user
 def authenticate(username, password):

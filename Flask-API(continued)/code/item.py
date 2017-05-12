@@ -1,3 +1,9 @@
+# CRUD
+# Create -- post
+# Read -- get
+# Update -- put
+# Delete -- delete
+
 import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
@@ -19,6 +25,14 @@ class Item(Resource):
     @jwt_required()
     # retrieve items from the DB
     def get(self, name):
+        item = self.find_by_name(name)
+
+        if item:
+            return item
+        return {"message": "Item not found"}, 404
+
+    @classmethod
+    def find_by_name(cls, name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -30,27 +44,35 @@ class Item(Resource):
         # if row exists, then return the name and price
         if row:
             return {'item': {'name': row[0], 'price': row[1]}}
-        # else return error message
-        return {"message:" "Item not found"}, 404
 
     # creating items
     def post(self,name):
-        # if next item is found
-        if next(filter(lambda x: x['name'] == name, items), None) is not None:
-            # return message
-            return {'message': "An item with name '{}' already exists.".format(name)}, 400
+        # return item if it already exists (from function "find_by_name")
+        # make sure item is not already in the DB
+        if self.find_by_name(name):
+            return {'message': "An item with name '{}' already exists.".format(name)},400
 
+        # parses data
         data = Item.parser.parse_args()
 
-        # hard coded 'price'
+        # JSON data
         item = {
             'name': name,
             'price': data['price']
         }
-        # add the item to the very end of 'items' list array
-        items.append(item)
 
-        # let the application know we created the item and added it to our 'DB'
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "INSERT INTO items VALUES (?,?)"
+
+        # insert JSON data into DB
+        cursor.execute(query, (item['name'], item['price']))
+
+        connection.commit()
+        connection.close()
+
+        # return the item to DB
         # HTTP status code '201' means object has been created
         return item, 201
 

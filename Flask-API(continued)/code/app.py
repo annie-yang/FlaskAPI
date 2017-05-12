@@ -24,4 +24,6 @@ api.add_resource(ItemList, '/items')
 api.add_resource(UserRegister, '/register')
 
 # run on port and show error message
-app.run(port=5000, debug=True)
+# run flask app
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)

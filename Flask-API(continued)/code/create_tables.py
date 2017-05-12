@@ -18,9 +18,6 @@ cursor.execute(create_table)
 create_table = "CREATE TABLE IF NOT EXISTS items (name text, price real)"
 cursor.execute(create_table)
 
-# insert into items table the values
-cursor.execute("INSERT INTO items VALUES('test', 10.99)")
-
 # save all of our changes into data.db file
 connection.commit()
 

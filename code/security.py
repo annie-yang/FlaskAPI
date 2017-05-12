@@ -9,10 +9,12 @@ users = [
 ]
 
 # assigning key value pair
+# retrieve user by username and id
 username_mapping = {u.username: u for u in users}
 userid_mapping = {u.id: u for u in users}
 
 # authenticate the user
+# compare user's password/username with mapping password/username
 def authenticate(username, password):
     # find username by mapping
     # if no user with that username in mapping, return 'None'
@@ -26,4 +28,4 @@ def identity(payload):
     # extract user ID from the payload
     user_id = payload['identity']
     # retrieve specific user
-    return userid_table.get(user_id, None)
+    return userid_mapping.get(user_id, None)

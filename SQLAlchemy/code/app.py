@@ -7,6 +7,7 @@ from security import authenticate, identity
 # looks in resources package (folder) and finds the file
 from resources.user import UserRegister
 from resources.item import Item, ItemList
+from resources.store import Store, StoreList
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
@@ -29,8 +30,10 @@ def create_tables():
 jwt = JWT(app, authenticate, identity)
 
 # access Student API
+api.add_resource(Store, '/store/<string:name>')
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
+api.add_resource(StoreList, '/stores')
 api.add_resource(UserRegister, '/register')
 
 # run on port and show error message
